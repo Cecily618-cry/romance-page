@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>给梅梅的专属💖</title>
+    <style>
+        /* 全局样式：渐变背景+消除默认边距 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            min-height: 100vh;
+            /* 浪漫渐变背景（从粉紫到淡蓝） */
+            background: linear-gradient(135deg, #fdf2f8 0%, #f0f8fb 100%);
+            overflow: hidden; /* 隐藏滚动条 */
+            font-family: "Arial", "Microsoft YaHei", "PingFang SC", sans-serif;
+        }
+
+        /* 中心3D爱心样式 */
+        .heart-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            perspective: 1000px; /* 3D透视效果 */
+            cursor: pointer; /* 鼠标悬浮变指针，提示可点击 */
+        }
+        .heart {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: rotateHeart 10s linear infinite; /* 3D旋转动画 */
+        }
+        /* 爱心形状（用两个半圆+旋转组合） */
+        .heart:before, .heart:after {
+            content: "";
+            width: 100px;
+            height: 160px;
+            background: linear-gradient(to bottom, #ff2e63, #f72585); /* 爱心渐变 */
+            border-radius: 50px 50px 0 0;
+            position: absolute;
+            box-shadow: 0 0 30px rgba(255, 46, 99, 0.5); /* 爱心发光阴影 */
+        }
+        .heart:before {
+            left: 100px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .heart:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        /* 3D旋转动画 */
+        @keyframes rotateHeart {
+            0% { transform: rotateY(0deg) rotateX(0deg); }
+            50% { transform: rotateY(180deg) rotateX(20deg); }
+            100% { transform: rotateY(360deg) rotateX(0deg); }
+        }
+        /* 点击爱心绽放特效 */
+        .heart-burst {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 46, 99, 0.3);
+            box-shadow: 0 0 20px rgba(255, 46, 99, 0.6);
+            animation: burst 1.5s ease-out forwards;
+            pointer-events: none; /* 不影响点击 */
+        }
+        @keyframes burst {
+            0% { width: 0; height: 0; opacity: 1; }
+            100% { width: 400px; height: 400px; opacity: 0; }
+        }
+
+        /* 漂浮文字样式 */
+        .floating-text {
+            position: absolute;
+            color: #fff;
+            font-size: 16px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3); /* 文字阴影，更立体 */
+            opacity: 0;
+            animation: float 8s ease-in-out infinite;
+            pointer-events: none; /* 不影响点击 */
+            padding: 5px 10px;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.1); /* 文字背景半透明 */
+        }
+        /* 漂浮动画（随机轨迹） */
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translate(random(-300, 300)px, random(-300, 300)px) rotate(random(-10, 10)deg);
+                opacity: 0;
+            }
+        }
+
+        /* 点击生成的小爱心样式 */
+        .mini-heart {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            opacity: 0;
+            animation: miniHeartFloat 3s ease-out forwards;
+            pointer-events: none;
+        }
+        .mini-heart:before, .mini-heart:after {
+            content: "";
+            width: 15px;
+            height: 24px;
+            background: #ff6b9d;
+            border-radius: 15px 15px 0 0;
+            position: absolute;
+        }
+        .mini-heart:before {
+            left: 15px;
+            transform: rotate(-45deg);
+            transform-origin: 0 100%;
+        }
+        .mini-heart:after {
+            left: 0;
+            transform: rotate(45deg);
+            transform-origin: 100% 100%;
+        }
+        @keyframes miniHeartFloat {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 1;
+            }
+            50% { transform: scale(1.2) rotate(10deg); }
+            100% {
+                transform: scale(0.8) translateY(-50px) rotate(20deg);
+                opacity: 0;
+            }
+        }
+
+        /* 悄悄话弹窗样式 */
+        .secret-popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            background: linear-gradient(135deg, #fdf2f8 0%, #fef7fb 100%);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s ease;
+            max-width: 80%;
+            text-align: center;
+        }
+        .secret-popup.active {
+            opacity: 1;
+            transform: translate(-50%, -50%) scale(1);
+            pointer-events: auto;
+        }
+        .secret-text {
+            font-size: 22px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .close-popup {
+            padding: 8px 20px;
+            background: #ff2e63;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .close-popup:hover {
+            background: #f72585;
+        }
+
+        /* 页面加载提示 */
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ff6b9d;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading">正在加载心意...💖</div>
+
+    <!-- 中心3D爱心 -->
+    <div class="heart-container" id="heartContainer">
+        <div class="heart" id="heart"></div>
+        <div class="heart-burst" id="heartBurst"></div>
+    </div>
+
+    <!-- 悄悄话弹窗 -->
+    <div class="secret-popup" id="secretPopup">
+        <div class="secret-text" id="secretText"></div>
+        <button class="close-popup" id="closePopup">收到啦～</button>
+    </div>
+
+    <script>
+        // 等待页面加载完成
+        window.onload = function() {
+            // 隐藏加载提示
+            document.querySelector('.loading').style.display = 'none';
+
+            // 1. 浪漫文字列表
+            const loveTexts = [
+                "见到你就很开心呀✨",
+                "你笑起来真的好好看",
+                "偷偷想你ing",
+                "今天也喜欢你",
+                "和你聊天很治愈",
+                "你真的很特别",
+                "想和你多待一会儿",
+                "你是我的小幸运",
+                "满心满眼都是你",
+                "慢慢靠近，慢慢喜欢你",
+                "你的消息我秒回",
+                "见不到你会有点想你",
+                "你就是我的小美好",
+                "想和你看遍所有晚霞",
+                "偷偷告诉你：我超喜欢你",
+                "和你在一起的时光都很甜",
+                "你的声音好好听",
+                "连发呆都在想你",
+                "你穿这件衣服真好看",
+                "想和你去喝下午茶",
+                "你比春风还温柔",
+                "看到你发的朋友圈就很开心",
+                "你认真的样子好有魅力",
+                "偷偷存了你的照片",
+                "想和你分享日常的小事",
+                "你一笑，我的世界都亮了",
+                "和你聊天永远不冷场",
+                "你是我藏在心里的温柔",
+                "期待下次和你见面",
+                "你喜欢的东西我都记着",
+                "和你在一起很安心",
+                "你的小习惯好可爱",
+                "想陪你走过每个四季",
+                "你是我最想留住的幸运",
+                "一想到你就忍不住傻笑"
+            ];
+            // 2. 点击爱心弹出的悄悄话
+            const secretTexts = [
+                "其实，我喜欢你",
+                "想和你有很多很多故事",
+                "你愿意和我进一步了解吗？",
+                "藏不住对你的欢喜呀",
+                "和你在一起的时光都很甜",
+                "你是我最想留住的幸运",
+                "偷偷把你放在心尖上了",
+                "想每天都能和你说早安晚安",
+                "你是不是也有点喜欢我呀？",
+                "遇见你是我今年最大的幸运",
+                "想和你从暧昧走到余生",
+                "我好像对你有点上头了",
+                "你的一切都让我很心动",
+                "想牵你的手，一起走下去",
+                "其实每次聊天都在偷偷紧张",
+                "你是我见过最温柔的人",
+                "想和你分享所有的喜怒哀乐",
+                "要不要试着和我在一起呀？"
+];
+
+            // 3. 生成漂浮文字
+            function createFloatingText() {
+                if (document.querySelectorAll('.floating-text').length < 12) { // 控制文字数量
+                    const text = document.createElement('div');
+                    text.className = 'floating-text';
+                    text.textContent = loveTexts[Math.floor(Math.random() * loveTexts.length)];
+                    
+                    // 随机位置（屏幕范围内）
+                    const x = Math.random() * window.innerWidth;
+                    const y = Math.random() * window.innerHeight;
+                    text.style.left = `${x}px`;
+                    text.style.top = `${y}px`;
+                    
+                    // 随机动画延迟和持续时间
+                    text.style.animationDelay = `${Math.random() * 5}s`;
+                    text.style.animationDuration = `${8 + Math.random() * 4}s`;
+                    
+                    // 随机文字颜色
+                    const colors = ['#ff2e63', '#ff6b9d', '#f72585', '#4299e1', '#9f7aea', '#48bb78'];
+                    text.style.color = colors[Math.floor(Math.random() * colors.length)];
+                    
+                    document.body.appendChild(text);
+
+                    // 文字消失后移除元素（避免内存占用）
+                    setTimeout(() => {
+                        text.remove();
+                    }, 12000);
+                }
+            }
+
+            // 4. 点击页面生成小爱心
+            document.body.addEventListener('click', function(e) {
+                // 排除点击爱心和弹窗时的情况
+                if (!e.target.closest('.heart-container') && !e.target.closest('.secret-popup')) {
+                    const miniHeart = document.createElement('div');
+                    miniHeart.className = 'mini-heart';
+                    miniHeart.style.left = `${e.clientX - 15}px`;
+                    miniHeart.style.top = `${e.clientY - 15}px`;
+                    document.body.appendChild(miniHeart);
+
+                    // 小爱心消失后移除
+                    setTimeout(() => {
+                        miniHeart.remove();
+                    }, 3000);
+                }
+            });
+
+            // 5. 点击中心爱心触发效果
+            const heartContainer = document.getElementById('heartContainer');
+            const heartBurst = document.getElementById('heartBurst');
+            const secretPopup = document.getElementById('secretPopup');
+            const secretText = document.getElementById('secretText');
+            const closePopup = document.getElementById('closePopup');
+
+            heartContainer.addEventListener('click', function() {
+                // 绽放特效重置
+                heartBurst.style.animation = 'none';
+                setTimeout(() => {
+                    heartBurst.style.animation = 'burst 1.5s ease-out forwards';
+                }, 10);
+
+                // 显示悄悄话弹窗
+                secretText.textContent = secretTexts[Math.floor(Math.random() * secretTexts.length)];
+                secretPopup.classList.add('active');
+            });
+
+            // 关闭弹窗
+            closePopup.addEventListener('click', function() {
+                secretPopup.classList.remove('active');
+            });
+
+            // 6. 定时生成漂浮文字（每1.5秒生成一个）
+            setInterval(createFloatingText, 1500);
+
+            // 初始化生成一批文字
+            for (let i = 0; i < 8; i++) {
+                createFloatingText();
+            }
+        };
+    </script>
+</body>
+</html>
